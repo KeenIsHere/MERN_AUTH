@@ -21,7 +21,6 @@ const Register = ({setCount}) => {
       >
         <div
           style={{
-            backgroundColor: "blue",
             height: "100%",
             backgroundImage: "url(./assets/register-bg.jpg)",
             backgroundSize: "cover",
@@ -117,7 +116,7 @@ const Register = ({setCount}) => {
               Register
             </button>
             <span>
-              Already have an account? <Link to="/">Login</Link>
+              Already have an account? <Link to="/login">Login</Link>
             </span>
           </form>
         </div>

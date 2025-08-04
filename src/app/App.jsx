@@ -5,20 +5,18 @@ import FlexExample from "../components/flex";
 import {createBrowserRouter, RouterProvider} from "react-router";
 
 function App() {
-  const [count, setCount] = useState(1);
-
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Login count={count} setCount={setCount} />,
+      element: <Login />,
     },
     {
       path: "/login",
-      element: <Login count={count} setCount={setCount} />,
+      element: <Login />,
     },
     {
       path: "/register",
-      element: <Register setCount={setCount} />,
+      element: <Register />,
     },
     {
       path: "/flex-example",

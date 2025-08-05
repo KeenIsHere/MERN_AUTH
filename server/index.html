@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YatraMitra - FYP Proposal Presentation</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: #333;
+            overflow: hidden;
+        }
+
+        .presentation-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide {
+            width: 90%;
+            max-width: 1200px;
+            height: 80vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            padding: 60px;
+            display: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide.active {
+            display: block;
+            animation: slideIn 0.5s ease-out;
+        }
+
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .slide::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 8px;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+        }
+
+        h1 {
+            font-size: 3em;
+            margin-bottom: 30px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+
+        h2 {
+            font-size: 2.5em;
+            margin-bottom: 40px;
+            color: #2c3e50;
+            border-bottom: 3px solid #667eea;
+            padding-bottom: 15px;
+        }
+
+        h3 {
+            font-size: 1.8em;
+            color: #34495e;
+            margin-bottom: 20px;
+        }
+
+        .content {
+            font-size: 1.3em;
+            line-height: 1.8;
+            color: #555;
+        }
+
+        .highlight {
+            background: linear-gradient(120deg, #a8edea 0%, #fed6e3 100%);
+            padding: 20px;
+            border-radius: 15px;
+            margin: 20px 0;
+            border-left: 5px solid #667eea;
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin: 30px 0;
+        }
+
+        .feature-card {
+            background: #f8f9ff;
+            padding: 25px;
+            border-radius: 15px;
+            border: 2px solid #e1e8ff;
+            transition: transform 0.3s ease;
+        }
+
+        .feature-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.1);
+        }
+
+        .tech-stack {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+            margin: 30px 0;
+        }
+
+        .tech-item {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 24px;
+            border-radius: 25px;
+            font-weight: 600;
+        }
+
+        .navigation {
+            position: fixed;
+            bottom: 30px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 15px;
+            z-index: 1000;
+        }
+
+        .nav-btn {
+            background: rgba(255,255,255,0.9);
+            border: none;
+            padding: 12px 24px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover {
+            background: #667eea;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .slide-counter {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            background: rgba(102, 126, 234, 0.1);
+            padding: 8px 16px;
+            border-radius: 20px;
+            font-weight: 600;
+            color: #667eea;
+        }
+
+        .speaker-notes {
+            position: fixed;
+            right: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 300px;
+            background: rgba(0,0,0,0.9);
+            color: white;
+            padding: 20px;
+            border-radius: 15px;
+            font-size: 0.9em;
+            line-height: 1.6;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            max-height: 80vh;
+            overflow-y: auto;
+        }
+
+        .speaker-notes.show {
+            opacity: 1;
+        }
+
+        .toggle-notes {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            border: none;
+            padding: 10px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            z-index: 1001;
+        }
+
+        .problem-list, .solution-list, .feature-list {
+            list-style: none;
+            margin: 20px 0;
+        }
+
+        .problem-list li, .solution-list li, .feature-list li {
+            padding: 15px 0;
+            border-bottom: 1px solid #eee;
+            position: relative;
+            padding-left: 30px;
+        }
+
+        .problem-list li::before {
+            content: "⚠️";
+            position: absolute;
+            left: 0;
+        }
+
+        .solution-list li::before {
+            content: "✅";
+            position: absolute;
+            left: 0;
+        }
+
+        .feature-list li::before {
+            content: "🔹";
+            position: absolute;
+            left: 0;
+        }
+
+        .future-features {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .future-card {
+            background: linear-gradient(135deg, #ffeaa7, #fab1a0);
+            padding: 20px;
+            border-radius: 12px;
+            text-align: center;
+            font-weight: 600;
+            color: #2d3436;
+        }
+
+        .logo-section {
+            text-align: center;
+            margin: 40px 0;
+        }
+
+        .project-logo {
+            font-size: 4em;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 20px;
+        }
+
+        .subtitle {
+            font-size: 1.5em;
+            color: #7f8c8d;
+            margin-bottom: 40px;
+        }
+    </style>
+</head>
+<body>
+    <div class="presentation-container">
+        <!-- Slide 1: Cover -->
+        <div class="slide active">
+            <div class="slide-counter">1/9</div>
+            <div class="logo-section">
+                <div class="project-logo">🧳 YatraMitra</div>
+                <h1>Online Travel Booking System</h1>
+                <div class="subtitle">Final Year Project Proposal</div>
+                <div class="highlight">
+                    <p><strong>Presented by:</strong> Krishna Rads</p>
+                    <p><strong>Department:</strong> [Your Program]</p>
+                    <p><strong>Institution:</strong> Informatics College Pokhara</p>
+                    <p><strong>Date:</strong> August 2025</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 2: Aims & Objectives -->
+        <div class="slide">
+            <div class="slide-counter">2/9</div>
+            <h2>🎯 Aims and Objectives</h2>
+            <div class="content">
+                <div class="highlight">
+                    <h3>Main Aim:</h3>
+                    <p>To design and develop a responsive travel booking web application that helps tourists easily explore, plan, and book travel experiences in Nepal through an automated system.</p>
+                </div>
+                <h3>Key Objectives:</h3>
+                <ul class="feature-list">
+                    <li>Build a simple and interactive user interface for tourists</li>
+                    <li>Provide destination discovery and package booking features</li>
+                    <li>Enable booking confirmation with basic payment tracking</li>
+                    <li>Offer admin functionality for managing packages and bookings</li>
+                    <li>Generate printable trip itineraries in PDF format</li>
+                    <li>Ensure the system is beginner-friendly, scalable, and mobile responsive</li>
+                </ul>
+            </div>
+        </div>
+
+        <!-- Slide 3: Problem Statement -->
+        <div class="slide">
+            <div class="slide-counter">3/9</div>
+            <h2>🚨 Problem Statement</h2>
+            <div class="content">
+                <h3>Current Challenges Faced by Tourists:</h3>
+                <ul class="problem-list">
+                    <li>Difficulty finding reliable travel information and packages</li>
+                    <li>Complex booking processes with third-party overhead</li>
+                    <li>Fragmented services - accommodation, transport, and guides separate</li>
+                    <li>Lack of verified digital itineraries or tickets</li>
+                    <li>Poor customer experience with manual booking systems</li>
+                </ul>
+                <div class="highlight">
+                    <p><strong>Core Issue:</strong> Traditional agencies rely heavily on manual systems or fragmented tools, causing inefficiencies, poor customer experience, and lack of digital record-keeping.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 4: Project as Solution -->
+        <div class="slide">
+            <div class="slide-counter">4/9</div>
+            <h2>💡 Project as a Solution</h2>
+            <div class="content">
+                <h3>How YatraMitra Addresses These Problems:</h3>
+                <ul class="solution-list">
+                    <li>Centralizes destination, hotel, and guide booking in a single platform</li>
+                    <li>Provides tourists with accessible options and guided booking flow</li>
+                    <li>Enables travel agencies (admin) to manage all data efficiently</li>
+                    <li>Ensures bookings generate downloadable PDF itineraries for offline use</li>
+                    <li>Offers a platform that can later be expanded into a real business solution</li>
+                </ul>
+                <div class="highlight">
+                    <h3>Value Proposition:</h3>
+                    <p>A one-stop digital solution that simplifies travel planning while supporting local tourism businesses in Nepal.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 5: Feature Highlights -->
+        <div class="slide">
+            <div class="slide-counter">5/9</div>
+            <h2>⭐ Core Feature Highlights</h2>
+            <div class="content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>👤 User Management</h3>
+                        <p>Email-based registration with secure login flow and profile management</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🏔️ Package Discovery</h3>
+                        <p>Filterable list of travel packages with detailed information and galleries</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎫 Booking System</h3>
+                        <p>Users can choose packages, enter details, and confirm bookings seamlessly</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>⚙️ Admin Panel</h3>
+                        <p>Admin can add/edit packages, view bookings, and manage system data</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📄 PDF Generation</h3>
+                        <p>Auto-generate printable trip confirmation and itinerary documents</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📱 Responsive Design</h3>
+                        <p>Accessible and optimized for both mobile and desktop devices</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 6: Technology Stack -->
+        <div class="slide">
+            <div class="slide-counter">6/9</div>
+            <h2>🧪 Technology Stack</h2>
+            <div class="content">
+                <div class="tech-stack">
+                    <div class="tech-item">React.js</div>
+                    <div class="tech-item">HTML5 & CSS3</div>
+                    <div class="tech-item">TailwindCSS</div>
+                    <div class="tech-item">Node.js</div>
+                    <div class="tech-item">Express.js</div>
+                    <div class="tech-item">MongoDB</div>
+                    <div class="tech-item">PDFKit</div>
+                    <div class="tech-item">Git & GitHub</div>
+                    <div class="tech-item">Figma</div>
+                </div>
+                <div class="highlight">
+                    <h3>Why This Stack?</h3>
+                    <p><strong>Frontend:</strong> React ensures component reusability and excellent performance for dynamic content</p>
+                    <p><strong>Backend:</strong> Node.js provides lightweight, scalable solution ideal for solo development</p>
+                    <p><strong>Database:</strong> MongoDB offers NoSQL flexibility for varied travel package structures</p>
+                    <p><strong>Tools:</strong> Modern development tools for efficient project management and design</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 7: Future Enhancements -->
+        <div class="slide">
+            <div class="slide-counter">7/9</div>
+            <h2>🚀 Future Enhancements</h2>
+            <div class="content">
+                <p style="margin-bottom: 30px; font-size: 1.2em; color: #7f8c8d;">Advanced features reserved for future development phases:</p>
+                <div class="future-features">
+                    <div class="future-card">💳 Payment Gateway<br>(eSewa/Khalti/Stripe)</div>
+                    <div class="future-card">🤖 AI-Based Package<br>Recommendations</div>
+                    <div class="future-card">🌤️ Live Weather<br>Integration</div>
+                    <div class="future-card">💬 Smart Chatbot<br>Support</div>
+                    <div class="future-card">📱 Mobile Application<br>Development</div>
+                    <div class="future-card">🔔 Real-time<br>Notifications</div>
+                    <div class="future-card">📱 QR Code Ticket<br>System</div>
+                    <div class="future-card">🎯 Role-based Access<br>Management</div>
+                </div>
+                <div class="highlight">
+                    <p><strong>Strategic Approach:</strong> Keeping advanced features for future phases ensures the core system remains manageable and deliverable within the project timeline.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 8: Conclusion -->
+        <div class="slide">
+            <div class="slide-counter">8/9</div>
+            <h2>📋 Project Summary</h2>
+            <div class="content">
+                <div class="feature-grid">
+                    <div class="feature-card">
+                        <h3>✅ Addresses Real Problems</h3>
+                        <p>Solves actual challenges faced by tourists and travel agencies in Nepal</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🔧 Technically Feasible</h3>
+                        <p>Well-scoped project suitable for solo development within given timeframe</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>📈 Scalable Foundation</h3>
+                        <p>Built with modular architecture allowing for future enhancements and growth</p>
+                    </div>
+                    <div class="feature-card">
+                        <h3>🎓 Educational Value</h3>
+                        <p>Integrates multiple technologies and provides comprehensive learning experience</p>
+                    </div>
+                </div>
+                <div class="highlight">
+                    <h3>Expected Outcomes:</h3>
+                    <p>A functional, user-friendly travel booking system that demonstrates both technical competency and practical business value, with potential for real-world deployment and commercialization.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Slide 9: Thank You -->
+        <div class="slide">
+            <div class="slide-counter">9/9</div>
+            <div class="logo-section">
+                <div class="project-logo">🧳 YatraMitra</div>
+                <h1>Thank You!</h1>
+                <div class="subtitle">Questions and Feedback Welcome</div>
+                <div class="highlight">
+                    <p style="font-size: 1.5em; font-weight: 600;">Krishna Rads</p>
+                    <p>Final Year Project Proposal</p>
+                    <p>Informatics College Pokhara</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation">
+        <button class="nav-btn" onclick="previousSlide()">← Previous</button>
+        <button class="nav-btn" onclick="nextSlide()">Next →</button>
+    </div>
+
+    <!-- Toggle Speaker Notes -->
+    <button class="toggle-notes" onclick="toggleNotes()">Speaker Notes</button>
+
+    <!-- Speaker Notes -->
+    <div class="speaker-notes" id="speakerNotes">
+        <div id="notesContent">
+            <!-- Notes will be populated by JavaScript -->
+        </div>
+    </div>
+
+    <script>
+        let currentSlide = 0;
+        const slides = document.querySelectorAll('.slide');
+        const totalSlides = slides.length;
+
+        const speakerNotes = [
+            // Slide 1 Notes
+            `<h4>Opening (30 seconds)</h4>
+            <p><strong>What to say:</strong> "Good [morning/afternoon], respected panel members. I'm Krishna Rads, and today I'm presenting my Final Year Project proposal for 'YatraMitra' - an online travel booking system designed to revolutionize how tourists explore and book travel experiences in Nepal."</p>
+            <p><strong>Body language:</strong> Stand confidently, make eye contact with all panel members, smile naturally.</p>
+            <p><strong>Pace:</strong> Speak slowly and clearly. This sets the tone for your entire presentation.</p>`,
+
+            // Slide 2 Notes
+            `<h4>Aims & Objectives (60 seconds)</h4>
+            <p><strong>Key points to emphasize:</strong></p>
+            <p>• "The main aim is to create a unified platform that serves both tourists and travel agencies"</p>
+            <p>• "Notice how I've focused on realistic, achievable objectives that can be completed by a single developer"</p>
+            <p>• "The responsive design objective is crucial since most tourists use mobile devices"</p>
+            <p><strong>Potential question:</strong> "Why focus on Nepal specifically?" Answer: "Nepal's tourism industry needs digital transformation, and focusing on local context allows for better user experience."</p>`,
+
+            // Slide 3 Notes
+            `<h4>Problem Statement (90 seconds)</h4>
+            <p><strong>Personal connection:</strong> "As someone who has witnessed these challenges firsthand, I identified a clear gap in the digital tourism infrastructure."</p>
+            <p><strong>Emphasize the pain points:</strong></p>
+            <p>• "Currently, tourists often have to visit multiple websites or physical offices"</p>
+            <p>• "Manual systems lead to errors and poor customer satisfaction"</p>
+            <p>• "There's no centralized way to get verified information"</p>
+            <p><strong>Connect to solution:</strong> End with "These problems create a clear opportunity for a digital solution."</p>`,
+
+            // Slide 4 Notes
+            `<h4>Project as Solution (75 seconds)</h4>
+            <p><strong>Solution mapping:</strong> "Notice how each solution directly addresses the problems I mentioned earlier."</p>
+            <p>• "Centralization solves the fragmentation issue"</p>
+            <p>• "Guided booking flow addresses complexity"</p>
+            <p>• "PDF generation provides the digital verification tourists need"</p>
+            <p><strong>Business value:</strong> "This isn't just a technical project - it has real potential for supporting Nepal's tourism recovery and growth."</p>
+            <p><strong>Confidence builder:</strong> "The solution is practical, focused, and achievable within my technical capabilities."</p>`,
+
+            // Slide 5 Notes
+            `<h4>Core Features (90 seconds)</h4>
+            <p><strong>Strategic scoping:</strong> "I've carefully selected features that are essential but manageable for solo development."</p>
+            <p><strong>Highlight technical decisions:</strong></p>
+            <p>• "User management uses industry-standard email verification"</p>
+            <p>• "Package discovery includes filtering - crucial for user experience"</p>
+            <p>• "PDF generation ensures users have offline access to their bookings"</p>
+            <p><strong>Defensive positioning:</strong> "These core features provide complete functionality while keeping the scope realistic."</p>
+            <p><strong>If asked about missing features:</strong> "Advanced features like payments are intentionally reserved for future phases to ensure quality delivery."</p>`,
+
+            // Slide 6 Notes
+            `<h4>Technology Stack (75 seconds)</h4>
+            <p><strong>Technical justification:</strong></p>
+            <p>• "React was chosen for its component reusability and performance"</p>
+            <p>• "Node.js provides lightweight backend perfect for solo development"</p>
+            <p>• "MongoDB offers flexibility for varying travel package data structures"</p>
+            <p><strong>Solo development focus:</strong> "This stack is well-documented, has great community support, and I'm comfortable with all these technologies."</p>
+            <p><strong>Scalability mention:</strong> "While simple enough for current scope, this stack can handle future scaling needs."</p>
+            <p><strong>If asked about alternatives:</strong> "I considered other options but this combination offers the best balance of simplicity and functionality."</p>`,
+
+            // Slide 7 Notes
+            `<h4>Future Enhancements (60 seconds)</h4>
+            <p><strong>Strategic positioning:</strong> "These features show the project's potential while keeping current scope manageable."</p>
+            <p><strong>Emphasize planning:</strong> "I've thought beyond the immediate requirements to demonstrate long-term vision."</p>
+            <p><strong>Key points:</strong></p>
+            <p>• "Payment integration is complex and would require third-party partnerships"</p>
+            <p>• "AI recommendations would need significant data collection first"</p>
+            <p>• "Mobile app development would be a natural next step"</p>
+            <p><strong>If questioned on timeline:</strong> "These could be implemented in 6-month cycles after the core system is stable."</p>`,
+
+            // Slide 8 Notes
+            `<h4>Project Summary (60 seconds)</h4>
+            <p><strong>Confidence building:</strong> "This project strikes the perfect balance between ambition and feasibility."</p>
+            <p><strong>Key strengths to emphasize:</strong></p>
+            <p>• "Addresses real market needs I've personally observed"</p>
+            <p>• "Technical scope is appropriate for individual development"</p>
+            <p>• "Modular design allows for organic growth"</p>
+            <p>• "Comprehensive learning experience across full-stack development"</p>
+            <p><strong>Value proposition:</strong> "This isn't just an academic exercise - it's a foundation for real-world impact."</p>`,
+
+            // Slide 9 Notes
+            `<h4>Closing & Q&A Preparation (30 seconds)</h4>
+            <p><strong>Final statement:</strong> "YatraMitra represents both technical competency and practical innovation. I'm excited to build something that could genuinely help Nepal's tourism sector."</p>
+            <p><strong>Q&A readiness:</strong></p>
+            <p>• Listen carefully to each question</p>
+            <p>• Take a moment to think before responding</p>
+            <p>• If unsure, acknowledge and offer to research further</p>
+            <p>• Redirect difficult questions to your project's strengths</p>
+            <p>• Stay confident and professional throughout</p>
+            <p><strong>Common questions to expect:</strong> Timeline, technical challenges, testing approach, scalability, market validation</p>`
+        ];
+
+        function showSlide(n) {
+            slides.forEach(slide => slide.classList.remove('active'));
+            currentSlide = (n + totalSlides) % totalSlides;
+            slides[currentSlide].classList.add('active');
+            updateSpeakerNotes();
+        }
+
+        function nextSlide() {
+            showSlide(currentSlide + 1);
+        }
+
+        function previousSlide() {
+            showSlide(currentSlide - 1);
+        }
+
+        function toggleNotes() {
+            const notes = document.getElementById('speakerNotes');
+            notes.classList.toggle('show');
+        }
+
+        function updateSpeakerNotes() {
+            const notesContent = document.getElementById('notesContent');
+            notesContent.innerHTML = speakerNotes[currentSlide];
+        }
+
+        // Keyboard navigation
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                nextSlide();
+            } else if (e.key === 'ArrowLeft') {
+                previousSlide();
+            } else if (e.key === 'n' || e.key === 'N') {
+                toggleNotes();
+            }
+        });
+
+        // Initialize
+        updateSpeakerNotes();
+
+        // Auto-advance slides (optional - uncomment for demo mode)
+        // setInterval(nextSlide, 10000); // Advance every 10 seconds
+    </script>
+</body>
+</html>

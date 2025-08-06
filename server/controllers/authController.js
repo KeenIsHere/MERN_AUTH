@@ -1,7 +1,7 @@
 import bycrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import userModel from '../models/userModel.js';
-
+import transporter from '../config/nodemailer.js';
 
 
 export const register = async (req, res) => {
@@ -17,7 +17,9 @@ export const register = async (req, res) => {
         const existingUser = await userModel.findOne({ email })
 
         if (existingUser) {
-            return res.json({ success: false, message: 'User already exists' });
+            return res
+            .status(400)
+            .json({ success: false, message: 'User already exists' });
         }
 
         const hashedPassword = await bycrypt.hash(password, 10); 
@@ -41,6 +43,16 @@ export const register = async (req, res) => {
             maxAge: 7 * 24 * 60 * 60 * 1000 // 7 days
         });
 
+        //Sending a welcome email 
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: email,
+            subject: 'Registration Successful',
+            text: `Welcome ${email}, your account has been created successfully!`
+        }; 
+
+        await transporter.sendMail(mailOptions);
+        // Sending a welcome email
 
         return res.json({ success: true, message: 'Registration successful' });
 
@@ -55,7 +67,9 @@ export const login = async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-        return res.json({ success: false, message: 'Email And Password Are Requires' })
+        return res
+        .status(400)
+        .json({ success: false, message: 'Email And Password Are Requires' })
     }
 
     try {

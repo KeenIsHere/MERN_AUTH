@@ -208,4 +208,66 @@ export const sendResetOtp = async (req, res) => {
     if (!email) {
         return res.json({ success: false, message: 'Email is required' });
     }
+    try{
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+        const otp = String(Math.floor(100000 + Math.random() * 900000)); // Generate a 6-digit OTP
+        user.resetOtp = otp;
+        user.resetOtpExpireAt = Date.now() + 15 * 60 * 1000; // 15 minutes
+
+        await user.save();
+
+        const mailOptions = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: 'Password Reset OTP',
+            text: `Your OTP for password reset is ${otp}`
+        };
+
+        await transporter.sendMail(mailOptions);
+
+        return res.json({ success: true, message: 'OTP sent to your email' }); 
+    }
+    catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
+} 
+
+// reset user password using OTP
+export const resetPassword = async (req, res) => {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+        return res.json({ success: false, message: 'Missing Details' });
+    }
+    try {
+
+        const user = await userModel.findOne({ email });
+        if (!user) {
+            return res.json({ success: false, message: 'User not found' });
+        }
+
+        if (user.resetOtp === '' || user.resetOtp !== otp) {
+            return res.json({ success: false, message: 'Invalid or expired OTP' });
+        }
+
+        if (user.resetOtpExpireAt < Date.now()) {
+            return res.json({ success: false, message: 'OTP has expired' });
+        }
+        // If OTP is valid, reset the password
+
+        const hashedPassword = await bycrypt.hash(newPassword, 10);
+        
+        user.password = hashedPassword;
+        user.resetOtp = '';
+        user.resetOtpExpireAt = 0;
+
+        await user.save();
+        // Sending a confirmation email
+        return res.json({ success: true, message: 'Password reset successful' });
+
+    } catch (error) {
+        return res.json({ success: false, message: error.message });
+    }
 }

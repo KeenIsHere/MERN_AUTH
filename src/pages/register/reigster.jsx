@@ -1,5 +1,7 @@
 import {useState} from "react";
-import {Link} from "react-router";
+import {Link, useNavigate} from "react-router";
+import { baseUrl } from "../../constant";
+import toast from "react-hot-toast";
 
 const Register = ({setCount}) => {
   const [formData, setFormData] = useState({
@@ -7,6 +9,38 @@ const Register = ({setCount}) => {
     email: "",
     password: "",
   });
+
+  const navigate= useNavigate()
+
+
+  async function reigster(e){
+    try {
+    e.preventDefault();
+
+  const form= new FormData();
+    form.append("full_name", formData.fullName);
+    form.append("email", formData.email);
+    form.append("password", formData.password);
+
+
+    var response= await fetch(`${baseUrl}/auth/register.php`,{
+      method:"POST",
+      body: form,
+    });   
+    var data = await response.json();
+
+    if(data.success){
+      toast.success(data.message ?? "User registered successfully!");
+      navigate("/login");
+    }else{
+      toast.error(data.message ?? "Registration failed. Please try again.");
+    }
+  }catch (error) {
+    console.error("Error during registration:", error);
+   
+    toast.error("An error occurred. Please try again later.");
+  }
+  }
 
   return (
     <>
@@ -38,12 +72,7 @@ const Register = ({setCount}) => {
           }}
         >
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              console.log(e);
-              console.log("Form submitted");
-              console.log(formData);
-            }}
+            onSubmit={reigster}
             style={{
               display: "flex",
               maxWidth: "400px",

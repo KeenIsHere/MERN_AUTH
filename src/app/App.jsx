@@ -3,6 +3,7 @@ import Login from "../pages/login/login";
 import Register from "../pages/register/reigster";
 import FlexExample from "../components/flex";
 import {createBrowserRouter, RouterProvider} from "react-router";
+import { Toaster } from "react-hot-toast";
 
 function App() {
   const router = createBrowserRouter([
@@ -30,6 +31,7 @@ function App() {
 
   return (
     <>
+    <Toaster/>
       <RouterProvider router={router} />
     </>
   );

@@ -1,1 +1,1 @@
-export const baseUrl = "http://localhost/mydatabase";
+export const baseUrl = "http://localhost/react-api/helpers";

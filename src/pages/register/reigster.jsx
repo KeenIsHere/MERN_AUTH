@@ -3,7 +3,7 @@ import {Link, useNavigate} from "react-router";
 import { baseUrl } from "../../constant";
 import toast from "react-hot-toast";
 
-const Register = ({setCount}) => {
+const Register = () => {
   const [formData, setFormData] = useState({
     fullName: "",
     email: "",

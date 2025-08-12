@@ -1,6 +1,6 @@
 import {useState} from "react";
 import {Link, useNavigate} from "react-router";
-import { baseUrl } from "../../constant";
+import {baseUrl} from "../../constant";
 import toast from "react-hot-toast";
 
 const Register = () => {
@@ -10,36 +10,34 @@ const Register = () => {
     password: "",
   });
 
-  const navigate= useNavigate()
+  const navigate = useNavigate();
 
-
-  async function reigster(e){
+  async function reigster(e) {
     try {
-    e.preventDefault();
+      e.preventDefault();
 
-  const form= new FormData();
-    form.append("full_name", formData.fullName);
-    form.append("email", formData.email);
-    form.append("password", formData.password);
+      const form = new FormData();
+      form.append("full_name", formData.fullName);
+      form.append("email", formData.email);
+      form.append("password", formData.password);
 
+      var response = await fetch(`${baseUrl}/auth/register.php`, {
+        method: "POST",
+        body: form,
+      });
+      var data = await response.json();
 
-    var response= await fetch(`${baseUrl}/auth/register.php`,{
-      method:"POST",
-      body: form,
-    });   
-    var data = await response.json();
+      if (data.success) {
+        toast.success(data.message);
+        navigate("/login");
+      } else {
+        toast.error(data.message ?? "Registration failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during registration:", error);
 
-    if(data.success){
-      toast.success(data.message ?? "User registered successfully!");
-      navigate("/login");
-    }else{
-      toast.error(data.message ?? "Registration failed. Please try again.");
+      toast.error("An error occurred. Please try again later.");
     }
-  }catch (error) {
-    console.error("Error during registration:", error);
-   
-    toast.error("An error occurred. Please try again later.");
-  }
   }
 
   return (

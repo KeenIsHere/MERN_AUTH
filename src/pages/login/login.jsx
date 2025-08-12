@@ -1,11 +1,40 @@
 import {useState} from "react";
+import toast from "react-hot-toast";
 import {Link} from "react-router";
+import {baseUrl} from "../../constant";
 
 const Login = () => {
   const [formData, setFormData] = useState({
     email: "",
     password: "",
   });
+
+  async function login(e) {
+    try {
+      e.preventDefault();
+
+      const form = new FormData();
+      form.append("email", formData.email);
+      form.append("password", formData.password);
+
+      var response = await fetch(`${baseUrl}/auth/login.php`, {
+        method: "POST",
+        body: form,
+      });
+      var data = await response.json();
+
+      if (data.success) {
+        toast.success(data.message);
+        // navigate("/login");
+      } else {
+        toast.error(data.message ?? "Login failed. Please try again.");
+      }
+    } catch (error) {
+      console.error("Error during login:", error);
+
+      toast.error("An error occurred. Please try again later.");
+    }
+  }
 
   return (
     <>
@@ -37,12 +66,7 @@ const Login = () => {
           }}
         >
           <form
-            onSubmit={(e) => {
-              e.preventDefault();
-              console.log(e);
-              console.log("Form submitted");
-              console.log(formData);
-            }}
+            onSubmit={login}
             style={{
               display: "flex",
               maxWidth: "400px",
@@ -100,7 +124,7 @@ const Login = () => {
               }
             />
             <button className="button" type="submit">
-              Register
+              Login
             </button>
             <span>
               Don't have an account? <Link to="/register">Register</Link>

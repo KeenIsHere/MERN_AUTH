@@ -25,6 +25,19 @@ input {
   border-radius: 4px;
 }
 
+.text-area {
+  height: 100px;
+  width: 100%;
+}
+
+.select {
+  width: 100%;
+  padding: 12px;
+  margin: 10px 0;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+}
+
 .button {
   width: 400px;
   background-color: var(--primary);

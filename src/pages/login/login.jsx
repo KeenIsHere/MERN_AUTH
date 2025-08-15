@@ -25,7 +25,7 @@ const Login = () => {
 
       if (data.success) {
         toast.success(data.message);
-        // navigate("/login");
+        localStorage.setItem("token", data.token);
       } else {
         toast.error(data.message ?? "Login failed. Please try again.");
       }

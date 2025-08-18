@@ -235,7 +235,10 @@ export const sendResetOtp = async (req, res) => {
     }
 } 
 
-// reset user password using OTP
+// reset user password using OTPs
+// This function resets the user's password using the OTP sent to their email
+// async is used to handle asynchronous operations 
+// It checks if the OTP is valid and not expired before resetting the password
 export const resetPassword = async (req, res) => {
     const { email, otp, newPassword } = req.body;
     if (!email || !otp || !newPassword) {
@@ -271,3 +274,5 @@ export const resetPassword = async (req, res) => {
         return res.json({ success: false, message: error.message });
     }
 }
+
+// eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6IjY4YTMwNzdlZWM5MTNjMmM3ZTFjMzUyZiIsImlhdCI6MTc1NTUxNDc1MCwiZXhwIjoxNzU2MTE5NTUwfQ.fLsjhkiR68pUIMDzXtTfauvNbEeT9zhTvSDGZ6CMuG0

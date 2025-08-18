@@ -1,6 +1,6 @@
 import {useState} from "react";
 import toast from "react-hot-toast";
-import {Link} from "react-router";
+import {Link, useNavigate} from "react-router";
 import {baseUrl} from "../../constant";
 
 const Login = () => {
@@ -8,6 +8,8 @@ const Login = () => {
     email: "",
     password: "",
   });
+
+  const navigate = useNavigate();
 
   async function login(e) {
     try {
@@ -26,6 +28,7 @@ const Login = () => {
       if (data.success) {
         toast.success(data.message);
         localStorage.setItem("token", data.token);
+        navigate("/home");
       } else {
         toast.error(data.message ?? "Login failed. Please try again.");
       }

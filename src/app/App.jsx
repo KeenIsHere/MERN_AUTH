@@ -5,6 +5,7 @@ import FlexExample from "../components/flex";
 import {createBrowserRouter, RouterProvider} from "react-router";
 import {Toaster} from "react-hot-toast";
 import AddProductPage from "../pages/add-product/addProduct";
+import HomePage from "../pages/home/HomePage";
 
 function App() {
   const router = createBrowserRouter([
@@ -27,6 +28,10 @@ function App() {
     {
       path: "/add-product",
       element: <AddProductPage />,
+    },
+    {
+      path: "/home",
+      element: <HomePage />,
     },
     {
       path: "*",

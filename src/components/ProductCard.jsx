@@ -1,7 +1,11 @@
+import {useContext} from "react";
 import {baseUrl} from "../constant";
 import {FaCartPlus} from "react-icons/fa";
+import {CartContext} from "../context/cartContext";
 
 const ProductCard = ({product}) => {
+  const {addToCart} = useContext(CartContext);
+
   return (
     <div
       style={{
@@ -51,6 +55,13 @@ const ProductCard = ({product}) => {
             color: "green",
             cursor: "pointer",
           }}
+          onClick={() =>
+            addToCart({
+              ...product,
+              quantity: 1,
+            })
+            
+          }
         />
       </div>
     </div>

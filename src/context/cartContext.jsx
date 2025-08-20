@@ -9,7 +9,8 @@ export const CartContext = createContext({
 });
 
 export const CartProvider = ({children}) => {
-  const [cart, setCart] = useState([]);
+  const localCart = localStorage.getItem("cart");
+  const [cart, setCart] = useState(localCart ? JSON.parse(localCart) : []);
 
   const addToCart = (product) => {
     const existingProduct = cart.find(
@@ -19,17 +20,26 @@ export const CartProvider = ({children}) => {
     if (existingProduct) {
       toast.error("Product already in cart");
     } else {
-      setCart([...cart, product]);
+      const newCart = [...cart, product];
+      setCart(newCart);
+      localStorage.setItem("cart", JSON.stringify(newCart));
       toast.success("Product added to cart");
     }
   };
 
   const removeFromCart = (product) => {
-    setCart(cart.filter((item) => item.id !== product.id));
+    const newCart = cart.filter(
+      (item) => item.product_id !== product.product_id
+    );
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    toast.success("Product removed from cart");
   };
 
   const clearCart = () => {
     setCart([]);
+    localStorage.removeItem("cart");
+    toast.success("Cart cleared");
   };
 
   return (

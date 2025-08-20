@@ -2,10 +2,12 @@ import {useEffect, useState} from "react";
 import Navbar from "../../components/Navbar";
 import {baseUrl} from "../../constant";
 import ProductCard from "../../components/ProductCard";
+import {useNavigate} from "react-router";
 
 const HomePage = () => {
   const [search, setSearch] = useState("");
   const [products, setProducts] = useState([]);
+  const navigate = useNavigate();
 
   async function getProducts() {
     const token = localStorage.getItem("token");
@@ -29,7 +31,13 @@ const HomePage = () => {
   }
 
   useEffect(() => {
-    getProducts();
+    if (localStorage.getItem("token")) {
+      getProducts();
+    } else {
+      navigate("/login", {
+        replace: true,
+      });
+    }
   }, []);
 
   useEffect(() => {

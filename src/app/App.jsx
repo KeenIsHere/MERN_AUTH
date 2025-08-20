@@ -9,10 +9,11 @@ import HomePage from "../pages/home/HomePage";
 import {CartProvider} from "../context/cartContext";
 
 function App() {
+  const token = localStorage.getItem("token");
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <Login />,
+      element: token ? <HomePage /> : <Login />,
     },
     {
       path: "/login",

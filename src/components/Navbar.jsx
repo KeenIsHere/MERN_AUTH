@@ -2,7 +2,7 @@ import {useContext} from "react";
 import {FaShoppingCart} from "react-icons/fa";
 import {CartContext} from "../context/cartContext";
 import {CiLogout} from "react-icons/ci";
-import {useNavigate} from "react-router";
+import {Link, useNavigate} from "react-router";
 
 const Navbar = () => {
   const {cart} = useContext(CartContext);
@@ -20,9 +20,18 @@ const Navbar = () => {
           height: "50px",
         }}
       >
-        <div>
-          <h1>E-Commerce</h1>
-        </div>
+        <Link
+          style={{
+            textDecoration: "none",
+            color: "white",
+          }}
+          to="/"
+        >
+          <div>
+            <h1>E-Commerce</h1>
+          </div>
+        </Link>
+
         <div style={{display: "flex", alignItems: "center", gap: "50px"}}>
           <div
             style={{

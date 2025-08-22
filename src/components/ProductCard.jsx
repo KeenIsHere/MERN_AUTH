@@ -2,69 +2,77 @@ import {useContext} from "react";
 import {baseUrl} from "../constant";
 import {FaCartPlus} from "react-icons/fa";
 import {CartContext} from "../context/cartContext";
+import {Link} from "react-router";
 
 const ProductCard = ({product}) => {
   const {addToCart} = useContext(CartContext);
 
   return (
-    <div
+    <Link
+      to={`/products/${product.product_id}`}
       style={{
-        padding: "10px",
-        boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.3)",
-        borderRadius: "10px",
+        textDecoration: "none",
+        color: "black",
       }}
     >
       <div
         style={{
-          width: "250px",
-          height: "200px,",
+          padding: "10px",
+          boxShadow: "0 0 10px 0 rgba(0, 0, 0, 0.3)",
+          borderRadius: "10px",
         }}
       >
-        <img
-          src={`${baseUrl}/${product.image_url}`}
-          alt={product.product_title}
+        <div
           style={{
-            width: "100%",
-            height: "100%",
-            objectFit: "cover",
-            borderRadius: "10px",
-          }}
-        />
-      </div>
-      <div>
-        <span>{product.product_title}</span>
-        <p
-          style={{
-            fontSize: "12px",
-            color: "gray",
+            width: "250px",
+            height: "200px,",
           }}
         >
-          {product.category_name.toUpperCase()}
-        </p>
+          <img
+            src={`${baseUrl}/${product.image_url}`}
+            alt={product.product_title}
+            style={{
+              width: "100%",
+              height: "100%",
+              objectFit: "cover",
+              borderRadius: "10px",
+            }}
+          />
+        </div>
+        <div>
+          <span>{product.product_title}</span>
+          <p
+            style={{
+              fontSize: "12px",
+              color: "gray",
+            }}
+          >
+            {product.category_name.toUpperCase()}
+          </p>
+        </div>
+        <div style={{display: "flex", justifyContent: "space-between"}}>
+          <span>
+            {Number(product.price).toLocaleString("en-IN", {
+              style: "currency",
+              currency: "NPR",
+            })}
+          </span>
+          <FaCartPlus
+            style={{
+              fontSize: "20px",
+              color: "green",
+              cursor: "pointer",
+            }}
+            onClick={() =>
+              addToCart({
+                ...product,
+                quantity: 1,
+              })
+            }
+          />
+        </div>
       </div>
-      <div style={{display: "flex", justifyContent: "space-between"}}>
-        <span>
-          {Number(product.price).toLocaleString("en-IN", {
-            style: "currency",
-            currency: "NPR",
-          })}
-        </span>
-        <FaCartPlus
-          style={{
-            fontSize: "20px",
-            color: "green",
-            cursor: "pointer",
-          }}
-          onClick={() =>
-            addToCart({
-              ...product,
-              quantity: 1,
-            })
-            
-          }
-        />
-      </div>
-    </div>
+    </Link>
   );
 };
 

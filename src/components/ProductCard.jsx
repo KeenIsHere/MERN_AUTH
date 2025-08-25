@@ -63,12 +63,13 @@ const ProductCard = ({product}) => {
               color: "green",
               cursor: "pointer",
             }}
-            onClick={() =>
+            onClick={(e) => {
               addToCart({
                 ...product,
                 quantity: 1,
-              })
-            }
+              });
+              e.preventDefault();
+            }}
           />
         </div>
       </div>

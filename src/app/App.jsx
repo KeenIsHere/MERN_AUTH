@@ -8,6 +8,7 @@ import AddProductPage from "../pages/add-product/addProduct";
 import HomePage from "../pages/home/HomePage";
 import {CartProvider} from "../context/cartContext";
 import ProductDetail from "../pages/product-detail/ProductDetail";
+import CartPage from "../pages/cart/CartPage";
 
 function App() {
   const token = localStorage.getItem("token");
@@ -39,6 +40,10 @@ function App() {
     {
       path: "/products/:product_id",
       element: <ProductDetail />,
+    },
+    {
+      path: "/cart",
+      element: <CartPage />,
     },
     {
       path: "*",

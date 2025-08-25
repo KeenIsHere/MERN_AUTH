@@ -11,66 +11,97 @@ const Navbar = () => {
     <>
       <div
         style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "10px 40px",
-          backgroundColor: "var(--primary)",
-          color: "white",
-          height: "50px",
+          marginBottom: "100px",
         }}
       >
-        <Link
+        <div
           style={{
-            textDecoration: "none",
+            display: "flex",
+            position: "fixed",
+            justifyContent: "space-between",
+            alignItems: "center",
+            padding: "10px 40px",
+            backgroundColor: "var(--primary)",
             color: "white",
+            height: "50px",
+            top: 0,
+            left: 0,
+            right: 0,
+            zIndex: 1000,
           }}
-          to="/"
         >
-          <div>
-            <h1>E-Commerce</h1>
-          </div>
-        </Link>
-
-        <div style={{display: "flex", alignItems: "center", gap: "50px"}}>
-          <div
+          <Link
             style={{
-              position: "relative",
+              textDecoration: "none",
+              color: "white",
             }}
+            to="/"
           >
-            <FaShoppingCart size={24} />
-            <span
-              style={{
-                position: "absolute",
-                top: "-5px",
-                right: "-5px",
-                backgroundColor: "red",
-                borderRadius: "50%",
-                height: "16px",
-                aspectRatio: "1/1",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                color: "white",
-                fontSize: "14px",
-              }}
-            >
-              {cart.length}
-            </span>
+            <div>
+              <h1>E-Commerce</h1>
+            </div>
+          </Link>
+          <div style={{display: "flex", alignItems: "center", gap: "30px"}}>
+            <Link to="/" style={{textDecoration: "none", color: "white"}}>
+              <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                <span style={{fontSize: "18px", fontWeight: "500"}}>Home</span>
+              </div>
+            </Link>
+            <Link
+              to="/products"
+              style={{textDecoration: "none", color: "white"}}
+            ></Link>
+
+            <div style={{display: "flex", alignItems: "center", gap: "50px"}}>
+              <Link to="/cart" style={{textDecoration: "none", color: "white"}}>
+                <div
+                  style={{display: "flex", alignItems: "center", gap: "10px"}}
+                >
+                  <span style={{fontSize: "18px", fontWeight: "500"}}>
+                    Cart
+                  </span>
+                  <div
+                    style={{
+                      position: "relative",
+                    }}
+                  >
+                    <FaShoppingCart size={24} />
+                    <span
+                      style={{
+                        position: "absolute",
+                        top: "-5px",
+                        right: "-5px",
+                        backgroundColor: "red",
+                        borderRadius: "50%",
+                        height: "16px",
+                        aspectRatio: "1/1",
+                        display: "flex",
+                        justifyContent: "center",
+                        alignItems: "center",
+                        color: "white",
+                        fontSize: "14px",
+                      }}
+                    >
+                      {cart.length}
+                    </span>
+                  </div>
+                </div>
+              </Link>
+              <CiLogout
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  localStorage.removeItem("cart");
+                  navigate("/login", {
+                    replace: true,
+                  });
+                }}
+                style={{
+                  cursor: "pointer",
+                }}
+                size={28}
+              />
+            </div>
           </div>
-          <CiLogout
-            onClick={() => {
-              localStorage.removeItem("token");
-              localStorage.removeItem("cart");
-              navigate("/login", {
-                replace: true,
-              });
-            }}
-            style={{
-              cursor: "pointer",
-            }}
-            size={28}
-          />
         </div>
       </div>
     </>

@@ -6,6 +6,7 @@ export const CartContext = createContext({
   addToCart: () => {},
   removeFromCart: () => {},
   clearCart: () => {},
+  updateCart: () => {},
 });
 
 export const CartProvider = ({children}) => {
@@ -36,6 +37,15 @@ export const CartProvider = ({children}) => {
     toast.success("Product removed from cart");
   };
 
+  const updateCart = (product) => {
+    const newCart = cart.map((item) =>
+      item.product_id === product.product_id ? product : item
+    );
+    setCart(newCart);
+    localStorage.setItem("cart", JSON.stringify(newCart));
+    toast.success("Cart updated");
+  };
+
   const clearCart = () => {
     setCart([]);
     localStorage.removeItem("cart");
@@ -43,7 +53,9 @@ export const CartProvider = ({children}) => {
   };
 
   return (
-    <CartContext.Provider value={{cart, addToCart, removeFromCart, clearCart}}>
+    <CartContext.Provider
+      value={{cart, addToCart, removeFromCart, clearCart, updateCart}}
+    >
       {children}
     </CartContext.Provider>
   );

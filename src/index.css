@@ -53,3 +53,39 @@ input {
 .debug {
   outline: 1px solid red;
 }
+
+.custom-link {
+  text-decoration: none;
+  color: white;
+
+  &:hover {
+    text-decoration: underline;
+    text-underline-offset: 2px;
+  }
+}
+
+table {
+  border-collapse: collapse;
+  margin-top: 20px;
+  margin-right: 20px;
+  margin-left: 20px;
+}
+
+table,
+th,
+td {
+  border: 1px solid #ddd;
+}
+
+td {
+  padding: 10px;
+}
+
+th {
+  padding: 10px;
+  text-align: left;
+  background-color: var(--primary);
+  color: white;
+  font-weight: 500;
+  border: none;
+}

@@ -27,7 +27,7 @@ const Navbar = () => {
             top: 0,
             left: 0,
             right: 0,
-            zIndex: 1000,
+            zIndex: 999,
           }}
         >
           <Link
@@ -42,18 +42,22 @@ const Navbar = () => {
             </div>
           </Link>
           <div style={{display: "flex", alignItems: "center", gap: "30px"}}>
-            <Link to="/" style={{textDecoration: "none", color: "white"}}>
+            <Link to="/" className="custom-link">
               <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
                 <span style={{fontSize: "18px", fontWeight: "500"}}>Home</span>
               </div>
             </Link>
-            <Link
-              to="/products"
-              style={{textDecoration: "none", color: "white"}}
-            ></Link>
+
+            <Link to="/orders" className="custom-link">
+              <div style={{display: "flex", alignItems: "center", gap: "10px"}}>
+                <span style={{fontSize: "18px", fontWeight: "500"}}>
+                  Order History
+                </span>
+              </div>
+            </Link>
 
             <div style={{display: "flex", alignItems: "center", gap: "50px"}}>
-              <Link to="/cart" style={{textDecoration: "none", color: "white"}}>
+              <Link to="/cart" className="custom-link">
                 <div
                   style={{display: "flex", alignItems: "center", gap: "10px"}}
                 >

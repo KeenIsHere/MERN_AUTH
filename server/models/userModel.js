@@ -1,0 +1,59 @@
+import mongoose from "mongoose";
+
+
+const userSchema = new mongoose.Schema({
+        name: 
+        {
+        type: String, 
+        required: true
+        },
+        email: 
+        {
+        type: String, 
+        required: true, 
+        unique: true
+        },
+        password: 
+        {
+            type: String, 
+            required: true
+        },
+        verifyOtp: 
+        {
+            type: String, 
+            default: ''
+        },
+    verifyOtpExpireAt: 
+    {
+        type: Number, 
+        default: 0
+    },
+    isAccountVerified: 
+    {
+        type: Boolean, 
+        default: false
+    },
+    resetOtp: 
+    {
+        type: String, 
+        default: ''
+    },    
+    resetOtpExpireAt: 
+    {
+        type: Number, 
+        default: 0
+    },
+    role: 
+    {
+        type: String,
+        enum: ['user', 'admin'],
+        default: 'user'
+    }
+})
+
+const userModel = mongoose.models.user || mongoose.model('users', userSchema);
+
+export default userModel;
+
+// This code defines a Mongoose schema for a user model in a MongoDB database.
+// The schema includes fields for username, password, email, and various OTPs for verification and password reset.

@@ -1,0 +1,262 @@
+@page "/editor"
+@page "/editor/{DateCode}"
+@inject IJournalEntryService JournalEntryService
+@inject IMetadataService MetadataService
+@inject NavigationManager Navigation
+
+<div class="card">
+    <div class="top-bar">
+        <div>
+            <h2>Daily Entry</h2>
+            <small>Only one entry per day is allowed.</small>
+        </div>
+        <div class="chip-list">
+            <button class="btn-ghost" @onclick="LoadSelectedDay">Load Day</button>
+            <button class="btn-primary" @onclick="SaveEntry" disabled="_busy">Save</button>
+            @if (_hasExisting)
+            {
+                <button class="btn-ghost" @onclick="DeleteEntry" disabled="_busy">Delete</button>
+            }
+        </div>
+    </div>
+
+    @if (!string.IsNullOrWhiteSpace(_status))
+    {
+        <div class="pill">@_status</div>
+    }
+    @if (!string.IsNullOrWhiteSpace(_error))
+    {
+        <div class="error-banner">@_error</div>
+    }
+
+    <div class="card-grid">
+        <InputDate @bind-Value="Entry.EntryDate" TValue="DateTime" />
+        <InputText @bind-Value="Entry.Title" placeholder="Entry title" />
+        <InputSelect @bind-Value="Entry.PrimaryMoodId" TValue="int">
+            <option value="0">Primary mood</option>
+            @foreach (var mood in _moods)
+            {
+                <option value="@mood.Id">@mood.Name (@mood.MoodType)</option>
+            }
+        </InputSelect>
+        <InputSelect @bind-Value="Entry.CategoryId" TValue="int?">
+            <option value="">Category</option>
+            @foreach (var category in _categories)
+            {
+                <option value="@category.Id">@category.Name</option>
+            }
+        </InputSelect>
+    </div>
+
+    <textarea @bind="Entry.ContentMarkdown" @oninput="_ => UpdatePreview()" placeholder="Write in Markdown..."></textarea>
+</div>
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Secondary moods (max 2)</h3>
+        <div class="chip-list">
+            @foreach (var mood in _moods)
+            {
+                var selected = _secondaryMoodIds.Contains(mood.Id);
+                <button class="tag-chip @(selected ? "selected" : string.Empty)" @onclick="() => ToggleSecondaryMood(mood.Id)">@mood.Name</button>
+            }
+        </div>
+    </div>
+    <div class="card">
+        <h3>Tags</h3>
+        <div class="chip-list">
+            @foreach (var tag in _tags)
+            {
+                var selected = _tagIds.Contains(tag.Id);
+                <button class="tag-chip @(selected ? "selected" : string.Empty)" @onclick="() => ToggleTag(tag.Id)">@tag.Name</button>
+            }
+        </div>
+        <EditForm Model="this" OnValidSubmit="CreateCustomTag">
+            <InputText @bind-Value="_newTag" placeholder="Add custom tag" />
+            <button class="btn-ghost" type="submit">Add</button>
+        </EditForm>
+    </div>
+</div>
+
+<div class="card">
+    <h3>Preview</h3>
+    <div>@((MarkupString)_previewHtml)</div>
+</div>
+
+@code {
+    [Parameter] public string? DateCode { get; set; }
+
+    private JournalEntry Entry { get; set; } = new() { EntryDate = DateTime.Today };
+    private IReadOnlyList<Mood> _moods = Array.Empty<Mood>();
+    private IReadOnlyList<Category> _categories = Array.Empty<Category>();
+    private IReadOnlyList<Tag> _tags = Array.Empty<Tag>();
+    private readonly List<int> _secondaryMoodIds = new();
+    private readonly List<int> _tagIds = new();
+    private string? _status;
+    private string? _error;
+    private bool _busy;
+    private bool _hasExisting;
+    private string _previewHtml = string.Empty;
+    private string _newTag = string.Empty;
+    private readonly MarkdownPipeline _pipeline = new MarkdownPipelineBuilder().UseAdvancedExtensions().Build();
+
+    protected override async Task OnInitializedAsync()
+    {
+        _moods = await MetadataService.GetMoodsAsync();
+        _categories = await MetadataService.GetCategoriesAsync();
+        _tags = await MetadataService.GetTagsAsync();
+        await TryLoadFromRouteAsync();
+        UpdatePreview();
+    }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        await TryLoadFromRouteAsync();
+    }
+
+    private async Task TryLoadFromRouteAsync()
+    {
+        if (!string.IsNullOrWhiteSpace(DateCode) && DateTime.TryParse(DateCode, out var parsed))
+        {
+            Entry.EntryDate = parsed.Date;
+            await LoadSelectedDay();
+        }
+        else
+        {
+            var uri = Navigation.ToAbsoluteUri(Navigation.Uri);
+            if (QueryHelpers.ParseQuery(uri.Query).TryGetValue("date", out var dateValue) && DateTime.TryParse(dateValue, out var dateFromQuery))
+            {
+                Entry.EntryDate = dateFromQuery.Date;
+                await LoadSelectedDay();
+            }
+        }
+    }
+
+    private async Task LoadSelectedDay()
+    {
+        var detail = await JournalEntryService.GetByDateAsync(Entry.EntryDate);
+        if (detail != null)
+        {
+            Entry = detail.Entry;
+            _secondaryMoodIds.Clear();
+            _secondaryMoodIds.AddRange(detail.SecondaryMoods.Select(m => m.Id));
+            _tagIds.Clear();
+            _tagIds.AddRange(detail.Tags.Select(t => t.Id));
+            _hasExisting = true;
+            _status = $"Loaded entry for {Entry.EntryDate:dd MMM yyyy}.";
+        }
+        else
+        {
+            Entry = new JournalEntry
+            {
+                EntryDate = Entry.EntryDate.Date,
+                Title = string.Empty,
+                ContentMarkdown = string.Empty,
+                PrimaryMoodId = 0,
+                WordCount = 0
+            };
+            _secondaryMoodIds.Clear();
+            _tagIds.Clear();
+            _hasExisting = false;
+            _status = "Start writing fresh.";
+        }
+        UpdatePreview();
+    }
+
+    private async Task SaveEntry()
+    {
+        _busy = true;
+        _status = null;
+        _error = null;
+        var result = await JournalEntryService.CreateOrUpdateAsync(Entry, _secondaryMoodIds, _tagIds);
+        if (result.Success && result.Payload != null)
+        {
+            Entry = result.Payload.Entry;
+            _secondaryMoodIds.Clear();
+            _secondaryMoodIds.AddRange(result.Payload.SecondaryMoods.Select(m => m.Id));
+            _tagIds.Clear();
+            _tagIds.AddRange(result.Payload.Tags.Select(t => t.Id));
+            _hasExisting = true;
+            _status = "Entry saved.";
+        }
+        else
+        {
+            _error = result.ErrorMessage;
+        }
+        _busy = false;
+    }
+
+    private async Task DeleteEntry()
+    {
+        if (!_hasExisting || Entry.Id == 0)
+        {
+            return;
+        }
+
+        _busy = true;
+        var result = await JournalEntryService.DeleteAsync(Entry.Id);
+        if (result.Success)
+        {
+            _status = "Entry deleted.";
+            _hasExisting = false;
+            Entry = new JournalEntry { EntryDate = Entry.EntryDate.Date };
+            _secondaryMoodIds.Clear();
+            _tagIds.Clear();
+        }
+        else
+        {
+            _error = result.ErrorMessage;
+        }
+        _busy = false;
+    }
+
+    private void UpdatePreview()
+    {
+        _previewHtml = Markdown.ToHtml(Entry.ContentMarkdown ?? string.Empty, _pipeline);
+        StateHasChanged();
+    }
+
+    private void ToggleSecondaryMood(int moodId)
+    {
+        if (_secondaryMoodIds.Contains(moodId))
+        {
+            _secondaryMoodIds.Remove(moodId);
+        }
+        else if (_secondaryMoodIds.Count < 2)
+        {
+            _secondaryMoodIds.Add(moodId);
+        }
+    }
+
+    private void ToggleTag(int tagId)
+    {
+        if (_tagIds.Contains(tagId))
+        {
+            _tagIds.Remove(tagId);
+        }
+        else
+        {
+            _tagIds.Add(tagId);
+        }
+    }
+
+    private async Task CreateCustomTag()
+    {
+        if (string.IsNullOrWhiteSpace(_newTag))
+        {
+            return;
+        }
+
+        var result = await MetadataService.CreateCustomTagAsync(_newTag);
+        if (result.Success && result.Payload != null)
+        {
+            _tags = await MetadataService.GetTagsAsync();
+            _tagIds.Add(result.Payload.Id);
+            _newTag = string.Empty;
+        }
+        else
+        {
+            _error = result.ErrorMessage;
+        }
+    }
+}

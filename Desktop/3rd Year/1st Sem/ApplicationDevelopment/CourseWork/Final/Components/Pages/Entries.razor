@@ -1,0 +1,145 @@
+@page "/entries"
+@inject IJournalEntryService JournalEntryService
+@inject IMetadataService MetadataService
+@inject NavigationManager Navigation
+
+<div class="card">
+    <div class="card-grid">
+        <InputText @bind-Value="_keyword" placeholder="Search title or content" />
+        <InputDate @bind-Value="_filter.FromDate" TValue="DateTime?" />
+        <InputDate @bind-Value="_filter.ToDate" TValue="DateTime?" />
+        <button class="btn-primary" @onclick="ApplyFilters">Apply</button>
+    </div>
+
+    <div class="card-grid" style="margin-top:1rem;">
+        <div>
+            <label>Primary Moods</label>
+            <div class="chip-list">
+                @foreach (var mood in _moods)
+                {
+                    var selected = _filter.PrimaryMoodIds.Contains(mood.Id);
+                    <button class="tag-chip @(selected ? "selected" : string.Empty)" @onclick="async () => await TogglePrimaryMood(mood.Id)">@mood.Name</button>
+                }
+            </div>
+        </div>
+        <div>
+            <label>Tags</label>
+            <div class="chip-list">
+                @foreach (var tag in _tags)
+                {
+                    var selected = _filter.TagIds.Contains(tag.Id);
+                    <button class="tag-chip @(selected ? "selected" : string.Empty)" @onclick="async () => await ToggleTag(tag.Id)">@tag.Name</button>
+                }
+            </div>
+        </div>
+    </div>
+</div>
+
+@if (_results == null)
+{
+    <div class="card">Use the filters above to view entries.</div>
+}
+else if (!_results.Items.Any())
+{
+    <div class="card">No entries match your filters.</div>
+}
+else
+{
+    foreach (var entry in _results.Items)
+    {
+        <div class="card timeline-item">
+            <div class="top-bar">
+                <div>
+                    <h3>@entry.Title</h3>
+                    <small>@entry.EntryDate.ToString("dddd, dd MMM yyyy")</small>
+                </div>
+                <button class="btn-ghost" @onclick="() => OpenEntry(entry.EntryDate)">Open</button>
+            </div>
+            <p>@entry.Snippet</p>
+            <div class="pill">@entry.PrimaryMoodName</div>
+            @foreach (var tagName in entry.TagNames)
+            {
+                <span class="pill">@tagName</span>
+            }
+        </div>
+    }
+
+    <div class="timeline-pagination">
+        <button class="btn-ghost" @onclick="PrevPage" disabled="_filter.Page == 1">Prev</button>
+        <button class="btn-ghost" @onclick="NextPage" disabled="_results.TotalPages <= _filter.Page">Next</button>
+    </div>
+}
+
+@code {
+    private readonly JournalEntryFilter _filter = new() { PageSize = 5 };
+    private PagedResult<JournalEntrySummary>? _results;
+    private IReadOnlyList<Mood> _moods = Array.Empty<Mood>();
+    private IReadOnlyList<Tag> _tags = Array.Empty<Tag>();
+    private string? _keyword;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _moods = await MetadataService.GetMoodsAsync();
+        _tags = await MetadataService.GetTagsAsync();
+        await ApplyFilters();
+    }
+
+    private async Task ApplyFilters()
+    {
+        _filter.Page = 1;
+        _filter.Keyword = _keyword;
+        _results = await JournalEntryService.SearchAsync(_filter);
+        StateHasChanged();
+    }
+
+    private async Task TogglePrimaryMood(int moodId)
+    {
+        if (_filter.PrimaryMoodIds.Contains(moodId))
+        {
+            _filter.PrimaryMoodIds.Remove(moodId);
+        }
+        else
+        {
+            _filter.PrimaryMoodIds.Add(moodId);
+        }
+        await ApplyFilters();
+    }
+
+    private async Task ToggleTag(int tagId)
+    {
+        if (_filter.TagIds.Contains(tagId))
+        {
+            _filter.TagIds.Remove(tagId);
+        }
+        else
+        {
+            _filter.TagIds.Add(tagId);
+        }
+        await ApplyFilters();
+    }
+
+    private async Task PrevPage()
+    {
+        if (_filter.Page > 1)
+        {
+            _filter.Page--;
+            _results = await JournalEntryService.SearchAsync(_filter);
+            StateHasChanged();
+        }
+    }
+
+    private async Task NextPage()
+    {
+        if (_results != null && _filter.Page < _results.TotalPages)
+        {
+            _filter.Page++;
+            _results = await JournalEntryService.SearchAsync(_filter);
+            StateHasChanged();
+        }
+    }
+
+    private void OpenEntry(DateTime date)
+    {
+        Navigation.NavigateTo($"editor?date={date:yyyy-MM-dd}");
+    }
+}

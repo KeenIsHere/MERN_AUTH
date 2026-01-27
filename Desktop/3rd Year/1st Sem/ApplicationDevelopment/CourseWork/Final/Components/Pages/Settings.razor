@@ -1,0 +1,92 @@
+@page "/settings"
+@inject IPreferenceService PreferenceService
+@inject ThemeState ThemeState
+@inject IExportService ExportService
+@inject ISecurityService SecurityService
+
+<div class="card-grid">
+    <div class="card">
+        <h3>Theme</h3>
+        <p>Select your preferred look.</p>
+        <div class="chip-list">
+            <button class="tag-chip @(_theme == ThemePreference.Light ? "selected" : string.Empty)" @onclick="() => ChangeTheme(ThemePreference.Light)">Light</button>
+            <button class="tag-chip @(_theme == ThemePreference.Dark ? "selected" : string.Empty)" @onclick="() => ChangeTheme(ThemePreference.Dark)">Dark</button>
+        </div>
+    </div>
+
+    <div class="card">
+        <h3>Export to PDF</h3>
+        <div class="card-grid">
+            <InputDate @bind-Value="_exportFrom" TValue="DateTime" />
+            <InputDate @bind-Value="_exportTo" TValue="DateTime" />
+            <button class="btn-primary" @onclick="Export" disabled="_exporting">Export</button>
+        </div>
+        @if (!string.IsNullOrWhiteSpace(_exportStatus))
+        {
+            <small>@_exportStatus</small>
+        }
+    </div>
+
+    <div class="card">
+        <h3>Security</h3>
+        <p>Update your PIN (4+ characters).</p>
+        @if (!string.IsNullOrWhiteSpace(_securityStatus))
+        {
+            <small>@_securityStatus</small>
+        }
+        <InputText type="password" @bind-Value="_pin" placeholder="New PIN" />
+        <InputText type="password" @bind-Value="_confirmPin" placeholder="Confirm PIN" />
+        <button class="btn-primary" @onclick="SetPin">Save PIN</button>
+    </div>
+</div>
+
+@code {
+    private ThemePreference _theme = ThemePreference.Light;
+    private DateTime _exportFrom = DateTime.Today.AddMonths(-1);
+    private DateTime _exportTo = DateTime.Today;
+    private bool _exporting;
+    private string? _exportStatus;
+    private string _pin = string.Empty;
+    private string _confirmPin = string.Empty;
+    private string? _securityStatus;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _theme = await PreferenceService.GetThemeAsync();
+    }
+
+    private async Task ChangeTheme(ThemePreference preference)
+    {
+        _theme = preference;
+        await PreferenceService.SetThemeAsync(preference);
+        ThemeState.SetTheme(preference);
+    }
+
+    private async Task Export()
+    {
+        if (_exportFrom > _exportTo)
+        {
+            _exportStatus = "Invalid range.";
+            return;
+        }
+
+        _exporting = true;
+        var result = await ExportService.ExportEntriesAsync(_exportFrom, _exportTo);
+        _exporting = false;
+        _exportStatus = result.Success ? $"Saved to {result.Payload}" : result.ErrorMessage;
+    }
+
+    private async Task SetPin()
+    {
+        if (_pin != _confirmPin)
+        {
+            _securityStatus = "PINs do not match.";
+            return;
+        }
+
+        var result = await SecurityService.ConfigurePinAsync(_pin);
+        _securityStatus = result.Success ? "PIN updated." : result.ErrorMessage;
+        _pin = string.Empty;
+        _confirmPin = string.Empty;
+    }
+}
